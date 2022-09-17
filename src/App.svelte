@@ -46,9 +46,60 @@
   let btc = {};
   let eth = {};
   let doge = {};
+  let eur_usd;
+  let eur_cny;
+  let eur_jpy;
+  let eur_idr;
+  let eur_inr;
+  fetch(
+    'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur/usd.json'
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      if (data) {
+        eur_usd = data.usd;
+      }
+    });
 
+  fetch(
+    'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur/cny.json'
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      if (data) {
+        eur_cny = data.cny;
+      }
+    });
+  fetch(
+    'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur/jpy.json'
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      if (data) {
+        eur_jpy = data.jpy;
+      }
+    });
+  fetch(
+    'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur/idr.json'
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      if (data) {
+        eur_idr = data.idr;
+      }
+    });
+  fetch(
+    'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur/inr.json'
+  )
+    .then((response) => response.json())
+    .then((data) => {
+      if (data) {
+        eur_inr = data.inr;
+      }
+    });
   binance.onmessage = (event) => {
     binanceData = JSON.parse(event.data);
+    if (binanceData.c !== undefined) {
     if (binanceData.s === 'BTCUSDT') {
       btc = binanceData;
     } else if (binanceData.s === 'ETHUSDT') {
@@ -57,61 +108,29 @@
       doge = binanceData;
     }
     // append to each variable the value of the euro price
-    if (binanceData.s === 'BTCEUR') {
-      btc['eur'] = binanceData.c;
-    } else if (binanceData.s === 'ETHEUR') {
-      eth['eur'] = binanceData.c;
-    } else if (binanceData.s === 'DOGEEUR') {
-      doge['eur'] = binanceData.c;
+      if (binanceData.s === 'BTCEUR') {
+        btc['eur'] = binanceData.c;
+        btc['usd'] = btc['eur'] * eur_usd;
+        btc['cny'] = btc['eur'] * eur_cny;
+        btc['jpy'] = btc['eur'] * eur_jpy;
+        btc['idr'] = btc['eur'] * eur_idr;
+        btc['inr'] = btc['eur'] * eur_inr;
+      } else if (binanceData.s === 'ETHEUR') {
+        eth['eur'] = binanceData.c;
+        eth['usd'] = eth['eur'] * eur_usd;
+        eth['cny'] = eth['eur'] * eur_cny;
+        eth['jpy'] = eth['eur'] * eur_jpy;
+        eth['idr'] = eth['eur'] * eur_idr;
+        eth['inr'] = eth['eur'] * eur_inr;
+      } else if (binanceData.s === 'DOGEEUR') {
+        doge['eur'] = binanceData.c;
+        doge['usd'] = doge['eur'] * eur_usd;
+        doge['cny'] = doge['eur'] * eur_cny;
+        doge['jpy'] = doge['eur'] * eur_jpy;
+        doge['idr'] = doge['eur'] * eur_idr;
+        doge['inr'] = doge['eur'] * eur_inr;
+      }
     }
-
-    let eur_usd = fetch(
-      'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur/usd.json'
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        if (data) {
-          btc['usd'] = data.usd * btc['eur'];
-          eth['usd'] = data.usd * eth['eur'];
-          doge['usd'] = data.usd * doge['eur'];
-        }
-      });
-    let eur_cny = fetch(
-      'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur/cny.json'
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        btc['cny'] = data.cny * btc['eur'];
-        eth['cny'] = data.cny * eth['eur'];
-        doge['cny'] = data.cny * doge['eur'];
-      });
-    let eur_jpy = fetch(
-      'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur/jpy.json'
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        btc['jpy'] = data.jpy * btc['eur'];
-        eth['jpy'] = data.jpy * eth['eur'];
-        doge['jpy'] = data.jpy * doge['eur'];
-      });
-    let eur_idr = fetch(
-      'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur/idr.json'
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        btc['idr'] = data.idr * btc['eur'];
-        eth['idr'] = data.idr * eth['eur'];
-        doge['idr'] = data.idr * doge['eur'];
-      });
-    let eur_inr = fetch(
-      'https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/currencies/eur/inr.json'
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        btc['inr'] = data.inr * btc['eur'];
-        eth['inr'] = data.inr * eth['eur'];
-        doge['inr'] = data.inr * doge['eur'];
-      });
   };
 
   function handleSelect(event) {
@@ -120,11 +139,13 @@
   }
 </script>
 
-<main>
-  <Select {items} bind:value on:select={handleSelect} />
+<main class="flex flex-col">
+  <div class="m-auto">
+    <Select {items} bind:value on:select={handleSelect} />
+  </div>
   <div class="flex justify-around my-2 space-x-4">
     <div>
-      <div class="flex justify-between border p-5 drop-shadow-xl">
+      <div class="flex justify-between border p-5 shadow-xl">
         <div>
           BTC/USDT:
           <h2 class="font-bold">
@@ -146,10 +167,11 @@
           </p>
         {/if}
       </div>
+
       {value.value}: {btc[value.value.toLowerCase()]}
     </div>
     <div>
-      <div class="flex justify-between border p-5 drop-shadow-xl">
+      <div class="flex justify-between border p-5 shadow-xl">
         <div>
           ETH/USDT:
           <h2 class="font-bold">
@@ -171,10 +193,11 @@
           </p>
         {/if}
       </div>
+
       {value.value}: {eth[value.value.toLowerCase()]}
     </div>
     <div>
-      <div class="flex justify-between border p-5 drop-shadow-xl">
+      <div class="flex justify-between border p-5 shadow-xl">
         <div>
           DOGE/USDT:
           <h2 class="font-bold">
@@ -197,6 +220,7 @@
           </p>
         {/if}
       </div>
+
       {value.value}: {doge[value.value.toLowerCase()]}
     </div>
   </div>
